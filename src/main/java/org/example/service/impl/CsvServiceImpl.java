@@ -25,6 +25,11 @@ public class CsvServiceImpl implements CsvService {
     private CsvRepo csvRepo;
 
     @Override
+    public Iterable<CsvDao> getAllNicDetails() {
+        return csvRepo.findAll();
+    }
+
+    @Override
     public void saveCsv(MultipartFile file) {
         try (CSVReader csvReader = new CSVReader(new InputStreamReader(file.getInputStream()))) {
 
@@ -36,7 +41,7 @@ public class CsvServiceImpl implements CsvService {
 
                     CsvDao entity = validateNic(column);
 
-                    if (null != entity){
+                    if (null != entity) {
                         csvRepo.save(entity);
                     }
 
@@ -47,6 +52,11 @@ public class CsvServiceImpl implements CsvService {
         } catch (IOException | CsvException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public Iterable<CsvDao> getByGender(String gender) {
+        return csvRepo.findByGender(gender);
     }
 
     private CsvDao validateNic(String nic) {
@@ -60,9 +70,22 @@ public class CsvServiceImpl implements CsvService {
             bornYear = nic.substring(0, 4);
             birthDayOfTheYear = nic.substring(4, 7);
 
+            //Female block
             if (Integer.parseInt(nic.substring(4, 7)) > 500) {
+
                 gender = "FEMALE";
-                birthDayOfTheYear = "" + (Integer.parseInt(nic.substring(4, 7)) - 500);
+
+                if ((Integer.parseInt(nic.substring(4, 7)) - 500) < 10) {
+
+                    birthDayOfTheYear = "00" + (Integer.parseInt(nic.substring(4, 7)) - 500);
+
+                } else if ((Integer.parseInt(nic.substring(4, 7)) - 500) < 100) {
+
+                    birthDayOfTheYear = "0" + (Integer.parseInt(nic.substring(4, 7)) - 500);
+
+                }else {
+                    birthDayOfTheYear = "" + (Integer.parseInt(nic.substring(4, 7)) - 500);
+                }
             }
 
             String fullDate = bornYear + birthDayOfTheYear;

@@ -1,5 +1,6 @@
 package org.example.controllers;
 
+import org.example.dao.CsvDao;
 import org.example.service.CsvService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +17,16 @@ public class CsvController {
     @PostMapping
     public void saveCsv(@RequestParam("csv") MultipartFile file){
         service.saveCsv(file);
+    }
+
+    @GetMapping
+    public Iterable<CsvDao> getAllNicDetails(){
+        return service.getAllNicDetails();
+    }
+
+    @GetMapping("/{gender}")
+    public Iterable<CsvDao> getByGender(@PathVariable String gender){
+        return service.getByGender(gender);
     }
 
 }
