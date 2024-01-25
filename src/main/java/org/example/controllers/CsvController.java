@@ -15,17 +15,17 @@ public class CsvController {
     CsvService service;
 
     @PostMapping
-    public void saveCsv(@RequestParam("csv") MultipartFile file){
-        service.saveCsv(file);
+    public void saveCsv(@RequestParam("csv") MultipartFile[] files) {
+        service.saveCsv(files);
     }
 
     @GetMapping
-    public Iterable<CsvDao> getAllNicDetails(){
+    public Iterable<CsvDao> getAllNicDetails() {
         return service.getAllNicDetails();
     }
 
     @GetMapping("/{gender}")
-    public Iterable<CsvDao> getByGender(@PathVariable String gender){
+    public Iterable<CsvDao> getByGender(@PathVariable String gender) {
         return service.getByGender(gender);
     }
 

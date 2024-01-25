@@ -30,27 +30,30 @@ public class CsvServiceImpl implements CsvService {
     }
 
     @Override
-    public void saveCsv(MultipartFile file) {
-        try (CSVReader csvReader = new CSVReader(new InputStreamReader(file.getInputStream()))) {
+    public void saveCsv(MultipartFile[] files) {
+        for (MultipartFile file : files) {
 
-            List<String[]> nic = csvReader.readAll();
+            try (CSVReader csvReader = new CSVReader(new InputStreamReader(file.getInputStream()))) {
 
-            for (String[] row : nic) {
+                List<String[]> nic = csvReader.readAll();
 
-                for (String column : row) {
+                for (String[] row : nic) {
 
-                    CsvDao entity = validateNic(column);
+                    for (String column : row) {
 
-                    if (null != entity) {
-                        csvRepo.save(entity);
+                        CsvDao entity = validateNic(column);
+
+                        if (null != entity) {
+                            csvRepo.save(entity);
+                        }
+
                     }
 
                 }
 
+            } catch (IOException | CsvException e) {
+                e.printStackTrace();
             }
-
-        } catch (IOException | CsvException e) {
-            e.printStackTrace();
         }
     }
 
@@ -83,7 +86,7 @@ public class CsvServiceImpl implements CsvService {
 
                     birthDayOfTheYear = "0" + (Integer.parseInt(nic.substring(4, 7)) - 500);
 
-                }else {
+                } else {
                     birthDayOfTheYear = "" + (Integer.parseInt(nic.substring(4, 7)) - 500);
                 }
             }
