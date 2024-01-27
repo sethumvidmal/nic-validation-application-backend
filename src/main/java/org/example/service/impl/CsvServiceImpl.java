@@ -1,12 +1,14 @@
 package org.example.service.impl;
 
+import com.lowagie.text.*;
+import com.lowagie.text.pdf.PdfWriter;
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvException;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.example.dao.CsvDao;
 import org.example.repository.CsvRepo;
 import org.example.service.CsvService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,8 +23,11 @@ import java.util.List;
 @Slf4j
 public class CsvServiceImpl implements CsvService {
 
-    @Autowired
-    private CsvRepo csvRepo;
+    private final CsvRepo csvRepo;
+
+    public CsvServiceImpl(CsvRepo csvRepo) {
+        this.csvRepo = csvRepo;
+    }
 
     @Override
     public Iterable<CsvDao> getAllNicDetails() {
@@ -60,6 +65,33 @@ public class CsvServiceImpl implements CsvService {
     @Override
     public Iterable<CsvDao> getByGender(String gender) {
         return csvRepo.findByGender(gender);
+    }
+
+    @Override
+    public void generatePdf(HttpServletResponse response) throws IOException {
+        StringBuilder para = new StringBuilder();
+        for (CsvDao csvDao : getAllNicDetails()) {
+            para.append(csvDao.toString());
+        }
+        try (Document document = new Document(PageSize.A4)) {
+            PdfWriter.getInstance(document, response.getOutputStream());
+
+            document.open();
+            Font titleFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD);
+            titleFont.setSize(18);
+
+            Paragraph title = new Paragraph("Report", titleFont);
+            title.setAlignment(Element.ALIGN_CENTER);
+
+            Font contentFont = FontFactory.getFont(FontFactory.HELVETICA);
+            contentFont.setSize(12);
+
+            Paragraph content = new Paragraph(String.valueOf(para), contentFont);
+            content.setAlignment(Element.ALIGN_LEFT);
+
+            document.add(title);
+            document.add(content);
+        }
     }
 
     private CsvDao validateNic(String nic) {
