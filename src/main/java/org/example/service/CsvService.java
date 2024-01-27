@@ -15,4 +15,8 @@ public interface CsvService {
     Iterable<CsvDao> getByGender(String gender);
 
     public void generatePdf(HttpServletResponse response) throws IOException;
+
+    public int getFemaleCount();
+
+    public int getMaleCount();
 }

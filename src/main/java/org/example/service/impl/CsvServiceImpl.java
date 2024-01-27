@@ -94,6 +94,17 @@ public class CsvServiceImpl implements CsvService {
         }
     }
 
+    @Override
+    public int getFemaleCount() {
+        return csvRepo.countByGender("FEMALE");
+    }
+
+    @Override
+    public int getMaleCount() {
+        return csvRepo.countByGender("MALE");
+    }
+
+
     private CsvDao validateNic(String nic) {
 
         String bornYear;
